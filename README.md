@@ -39,8 +39,8 @@ The following workflow launches a dockerized `jupyter` server with an underlying
 Firs, retrieve our pre-made `docker-compose.yml` file: 
 ```bash
 $ cd my-project-dir
-$ wget https://bitbucket.org/buildnn/dsdb/raw/23b3ff150ef9cd2398e6098eeba2a7d912983f7e/docker-compose.yml
-$ wget https://bitbucket.org/buildnn/dsdb/raw/8088845bc9d96f60bcd9398d61609c82b8fb09bb/notebooks/dsdb_test.ipynb
+$ wget https://raw.githubusercontent.com/buildnn/dsdb/master/docker-compose.yml
+$ wget https://raw.githubusercontent.com/buildnn/dsdb/master/notebooks/dsdb_test.ipynb
 $ touch .env
 ```
 
@@ -76,7 +76,7 @@ Visit:
 
 To pip-install this repo:
 ```bash
-$ pip install git+https://bitbucket.org/buildnn/dsdb.git
+$ pip install git+https://github.com/buildnn/dsdb.git
 ```
 
 ## Connection to a custom DB server 

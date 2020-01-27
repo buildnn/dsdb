@@ -47,7 +47,7 @@ and... that's it.
 
 ## Install
 ```bash
-$ pip install git+git@bitbucket.org:buildnn/dsdb.git
+$ pip install git+https://buildnn.atlassian.net/browse/DSDB-6
 ```
 
 

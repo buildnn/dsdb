@@ -1,4 +1,7 @@
 .vscode/
+docker/
+data/
+.empty/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

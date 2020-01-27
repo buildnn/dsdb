@@ -1,0 +1,48 @@
+version: '3.7'
+services:
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: jupyter-dsdb
+    environment:
+      JUPYTER_ENABLE_LAB: 1
+      DSDB_USER: ${DSDB_USER}
+      DSDB_PASSWORD: ${DSDB_PASSWORD}
+      DSDB_DB: ${DSDB_DB}
+      DSDB_HOST: db:5432
+      DSDB_DRIVER: postgres+psycopg2
+    command: [
+      "/bin/bash", "-c", "conda install --yes --quiet psycopg2 sqlalchemy && pip install -q git+https://bitbucket.org/buildnn/dsdb.git && start-notebook.sh --notebook-dir /local_directory --ip 0.0.0.0 --no-browser"]
+    ports:
+        - 8888:8888
+    volumes:
+      - ./:/local_directory
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: https://bitbucket.org/buildnn/docker-dsdb-postgres.git
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      DSDB_USER: ${DSDB_USER}
+      DSDB_DB: ${DSDB_DB}
+      DSDB_PASSWORD: ${DSDB_PASSWORD}
+      POSTGRES_MULTIDB: "${DSDB_DB}:${DSDB_USER}:${DSDB_PASSWORD}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - 5050:5050
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

@@ -44,17 +44,18 @@ $ wget https://bitbucket.org/buildnn/dsdb/raw/8088845bc9d96f60bcd9398d61609c82b8
 $ touch .env
 ```
 
-open the `.env` file and place the following text, filling the `{text under curly brackets}` as suggested:
+Open the `.env` file and place the following text, filling the `{text under curly brackets}` as suggested:
+
+_content of the `.env` file -->_
 
 ```
-# content of .env file
-DSDB_USER=datascientist  # you can change this value
+DSDB_USER=datascientist
 DSDB_PASSWORD={your password}
-DSDB_DB=dsdb  # you can change this value
+DSDB_DB=dsdb
 
-POSTGRES_USER=admin  # you can change this value
+POSTGRES_USER=admin
 POSTGRES_PASSWORD={your db password}
-POSTGRES_DB=mydb  # you can change this value
+POSTGRES_DB=mydb
 
 PGADMIN_DEFAULT_EMAIL={your email}
 PGADMIN_DEFAULT_PASSWORD={another different password}

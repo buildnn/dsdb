@@ -12,7 +12,8 @@ Give a boost to your data management skills with `DsDb` (**D**ata **S**cience **
 
 1. [Basic usage of `DsDb`](#markdown-header-basic-usage-of-dsdb)
 2. [Quickstart with docker-compose](#markdown-header-quickstart-using-docker-compose)
-3. [Connection to a custom DB server](#markdown-header-connection_to_a_custom_db_server)
+3. [Pip Installation](#markdown-header-pip-installation)
+4. [Connection to a custom DB server](#markdown-header-connection_to_a_custom_db_server)
 
 ## Basic usage of `DsDb`
 
@@ -34,15 +35,12 @@ and... that's it.
 
 ## Quickstart using docker-compose
 
-Pip-install this repo:
-```bash
-$ pip install git+https://bitbucket.org/buildnn/dsdb.git
-```
-
 The following workflow launches a dockerized `jupyter` server with an underlying db.
 Firs, retrieve our pre-made `docker-compose.yml` file: 
 ```bash
+$ cd my-project-dir
 $ wget https://bitbucket.org/buildnn/dsdb/raw/23b3ff150ef9cd2398e6098eeba2a7d912983f7e/docker-compose.yml
+$ wget https://bitbucket.org/buildnn/dsdb/raw/8088845bc9d96f60bcd9398d61609c82b8fb09bb/notebooks/dsdb_test.ipynb
 $ touch .env
 ```
 
@@ -72,6 +70,13 @@ Visit:
 * `https://localhost:8888` to see jupyter
 * `https://localhost:5050` to visit the pgadmin panel (use the credentials in .env)
 
+
+## Pip Installation
+
+To pip-install this repo:
+```bash
+$ pip install git+https://bitbucket.org/buildnn/dsdb.git
+```
 
 ## Connection to a custom DB server 
 

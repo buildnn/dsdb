@@ -8,48 +8,69 @@ Take a look at what you can do with [Postgres](https://www.pgadmin.org/screensho
 
 Give a boost to your data management skills with `DsDb` (**D**ata **S**cience **D**ata**B**ase).
 
-
-## Idea
-
-The workflow to launch a dockerized `jupyter` server with an underlying db will be like:
-
-```bash
-$ docker-compose up
-```
-And... that's it. We will package db creation with docker (coming very soon, just wait a bit) and hidden integration of dsdb with no hassle.
-
 ## Contents
 
-1. [Basic usage of `DsDb`](#Basic_usage_of_DsDb)
-2. [Install](#Install)
-3. [Connection to a custom DB server](#Connection_to_a_custom_DB_server)
-
-
+1. [Basic usage of `DsDb`](#markdown-header-basic-usage-of-dsdb)
+2. [Quickstart with docker-compose](#markdown-header-quickstart-using-docker-compose)
+3. [Connection to a custom DB server](#markdown-header-connection_to_a_custom_db_server)
 
 ## Basic usage of `DsDb`
 
 Push a table from pandas to postgres with Just:
 
 ```python
-import dsdb
+from dsdb import DsDbConnect
 import pandas as pd
 
 # Load some data or take a DataFrame you analyzed
 df = pd.read_csv('my-ugly-file.csv')
 
-with dsdb.DsDbConnect() as con:
-    df.to_sql_table('table', con=con)
+with DsDbConnect() as con:
+    df.to_sql_table('table', con=con, if_exist='append')
 
 ```
 and... that's it.
 
 
+## Quickstart using docker-compose
 
-## Install
+Pip-install this repo:
 ```bash
-$ pip install git+https://bitbucket.org/buildnn/dsdb/src/
+$ pip install git+https://bitbucket.org/buildnn/dsdb.git
 ```
 
+The following workflow launches a dockerized `jupyter` server with an underlying db.
+Firs, retrieve our pre-made `docker-compose.yml` file: 
+```bash
+$ wget https://bitbucket.org/buildnn/dsdb/raw/23b3ff150ef9cd2398e6098eeba2a7d912983f7e/docker-compose.yml
+$ touch .env
+```
+
+open the `.env` file and place the following text, filling the `{text under curly brackets}` as suggested:
+
+```
+# content of .env file
+DSDB_USER=datascientist  # you can change this value
+DSDB_PASSWORD={your password}
+DSDB_DB=dsdb  # you can change this value
+
+POSTGRES_USER=admin  # you can change this value
+POSTGRES_PASSWORD={your db password}
+POSTGRES_DB=mydb  # you can change this value
+
+PGADMIN_DEFAULT_EMAIL={your email}
+PGADMIN_DEFAULT_PASSWORD={another different password}
+```
+And then start the game
+```
+$ docker-compose up
+```
+
+And... **that should be it**.
+
+Visit:
+* `https://localhost:8888` to see jupyter
+* `https://localhost:5050` to visit the pgadmin panel (use the credentials in .env)
 
 
 ## Connection to a custom DB server 

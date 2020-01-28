@@ -30,7 +30,12 @@ with DsDbConnect() as con:
     df.to_sql_table('table', con=con, if_exist='append')
 
 ```
-and... that's it.
+and... that's it. To load data from the db:
+
+```python
+with DsDbConnect() as con:
+    df_read = pd.read_sql_table('test', con)
+```
 
 
 ## Quickstart using docker-compose

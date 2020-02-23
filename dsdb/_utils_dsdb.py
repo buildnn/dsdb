@@ -12,20 +12,27 @@ def return_pwd(*args):
 
 @attr.s
 class DsDb(object):
-    usr = attr.ib(default=os.getenv("DSDB_USER"))
-    db = attr.ib(default=os.getenv("DSDB_DB"))
-    host = attr.ib(default=os.getenv("DSDB_HOST"))
-    driver = attr.ib(default=os.getenv("DSDB_DRIVER"))
-    pwd = attr.ib(default=os.getenv("DSDB_PASSWORD"), repr=False)
+    usr = attr.ib(default=None)
+    db = attr.ib(default=None)
+    host = attr.ib(default=None)
+    driver = attr.ib(default=None)
+    pwd = attr.ib(default=None, repr=False)
 
     def create_engine(self):
+
+        usr = self.usr if self.usr else os.getenv("DSDB_USER")
+        db = self.db if self.db else os.getenv("DSDB_DB")
+        host = self.host if self.host else os.getenv("DSDB_HOST")
+        driver = self.driver if self.driver else os.getenv("DSDB_DRIVER")
+        pwd = self.pwd if self.pwd else os.getenv("DSDB_PASSWORD")
+
         self.engine = create_engine(
             '{}://{}:{}@{}/{}'.format(
-                self.driver,
-                self.usr,
-                self.pwd,
-                self.host,
-                self.db,
+                driver,
+                usr,
+                pwd,
+                host,
+                db,
             ), echo=False)
         return self.engine
 

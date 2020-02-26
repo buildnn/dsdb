@@ -7,8 +7,10 @@ from datetime import datetime
 import attr
 from sqlalchemy import create_engine
 
+
 def return_pwd(*args):
     return "pwd is hidden"
+
 
 @attr.s
 class DsDb(object):
@@ -27,13 +29,8 @@ class DsDb(object):
         pwd = self.pwd if self.pwd else os.getenv("DSDB_PASSWORD")
 
         self.engine = create_engine(
-            '{}://{}:{}@{}/{}'.format(
-                driver,
-                usr,
-                pwd,
-                host,
-                db,
-            ), echo=False)
+            "{}://{}:{}@{}/{}".format(driver, usr, pwd, host, db,), echo=False
+        )
         return self.engine
 
     def connect(self):
@@ -46,6 +43,7 @@ class DsDb(object):
     def close(self):
         self.con.close()
         return self
+
 
 @contextlib.contextmanager
 def DsDbConnect(db=DsDb(), buf=print):

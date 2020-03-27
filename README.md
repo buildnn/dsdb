@@ -118,7 +118,7 @@ to pass to `dsdb.DsDbConnect`:
 ```python
 import dsdb
 
-db = dsdb.DsDb(
+db = dsdb._utils_dsdb.DsDb(
     usr='myuser',
     pwd=input('password:'),
     db='mydb',

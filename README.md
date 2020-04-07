@@ -1,8 +1,8 @@
 # Welcome to `dsdb`
 
-> Dsdb is a [Buildnn](https://www.buildnn.com) open source project.
+Dsdb is a [Buildnn](https://www.buildnn.com) open source project.
 
-Tired of having to manage thousands of unstructured .csv outputs for your small Data Science experiments? Would you like to experience a real SQL-like data management of yout datasets with a real database? 
+Tired of having to manage thousands of unstructured .csv outputs for your small Data Science experiments? Would you like to experience a real SQL-like data management of yout datasets with a real database?
 
 Take a look at what you can do with [Postgres](https://www.pgadmin.org/screenshots/#7).
 
@@ -30,6 +30,7 @@ with DsDbConnect() as con:
     df.to_sql_table('table', con=con, if_exist='append')
 
 ```
+
 and... that's it. To load data from the db:
 
 ```python
@@ -37,23 +38,23 @@ with DsDbConnect() as con:
     df_read = pd.read_sql_table('test', con)
 ```
 
-
 ## Quickstart using docker-compose
 
 The following workflow launches a dockerized `jupyter` server with an underlying db.
-Firs, retrieve our pre-made `docker-compose.yml` file: 
+Firs, retrieve our pre-made `docker-compose.yml` file:
+
 ```bash
-$ cd my-project-dir
-$ wget https://raw.githubusercontent.com/buildnn/dsdb/master/docker-compose.yml
-$ wget https://raw.githubusercontent.com/buildnn/dsdb/master/notebooks/dsdb_test.ipynb
-$ touch .env
+cd my-project-dir
+wget https://raw.githubusercontent.com/buildnn/dsdb/master/docker-compose.yml
+wget https://raw.githubusercontent.com/buildnn/dsdb/master/notebooks/dsdb_test.ipynb
+touch .env
 ```
 
 Open the `.env` file and place the following text, filling the `{text under curly brackets}` as suggested:
 
 _content of the `.env` file -->_
 
-```
+```ini
 DSDB_USER=datascientist
 DSDB_PASSWORD={your password}
 DSDB_DB=dsdb
@@ -65,36 +66,40 @@ POSTGRES_DB=mydb
 PGADMIN_DEFAULT_EMAIL={your email}
 PGADMIN_DEFAULT_PASSWORD={another different password}
 ```
+
 And then start the game
-```
-$ docker-compose up
+
+```bash
+docker-compose up
 ```
 
 And... **that should be it**.
 
 Visit:
+
 * `https://localhost:8888` to see jupyter
 * `https://localhost:5050` to visit the pgadmin panel (use the credentials in .env)
-
 
 ## Pip Installation
 
 To pip-install this repo:
+
 ```bash
-$ pip install git+https://github.com/buildnn/dsdb.git
+pip install dsdb
 ```
 
-## Connection to a custom DB server 
+## Connection to a custom DB server
 
 `dsdb.DsDbConnect` uses a `DsDb`
 object to connect to your db. It loads some
 **environment variables** and uses them to perform
 the connection. these are
+
 * `DSDB_USER`: your username in the DB
 * `DSDB_PASSWORD`: your password to access the DB
-* `DSDB_DB`: The name of the DB 
+* `DSDB_DB`: The name of the DB
 * `DSDB_HOST`: The address of the DB server
-* `DSDB_DRIVER`: The driver. E.g. `'postgres+psycopg2'` for a standard postgres. 
+* `DSDB_DRIVER`: The driver. E.g. `'postgres+psycopg2'` for a standard postgres.
 
 The following is a quick way to create
 them directly inside yout python script:
@@ -110,7 +115,7 @@ os.environ['DSDB_HOST'] = 'localhost:5432'  # server address
 os.environ['DSDB_DRIVER'] = 'postgres+psycopg2'
 
 ...
-``` 
+```
 
 another option is to create a custom `dsdb.DsDb` object
 to pass to `dsdb.DsDbConnect`:
@@ -128,4 +133,4 @@ db = dsdb._utils_dsdb.DsDb(
 with dsdb.DsDbConnect(db=db) as con:
     df.to_sql_table('table', con=con)
 ...
-``` 
+```

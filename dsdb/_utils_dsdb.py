@@ -6,6 +6,8 @@ import contextlib
 from datetime import datetime
 import attr
 from sqlalchemy import create_engine
+import boto3
+from pymongo import MongoClient
 
 
 def return_pwd(*args):
@@ -20,6 +22,9 @@ class DsDb(object):
     driver = attr.ib(default=None)
     hide_parameters = attr.ib(default=True)
     pwd = attr.ib(default=None, repr=False)
+    endpoint = attr.ib(default=None)
+    region = attr.ib(default=None)
+    db_type = attr.ib(default=None)
 
     def create_engine(self):
 
@@ -32,19 +37,32 @@ class DsDb(object):
         self.engine = create_engine(
             "{}://{}:{}@{}/{}".format(driver, usr, pwd, host, db,),
             echo=False,
-            hide_parameters=self.hide_parameters
+            hide_parameters=self.hide_parameters,
         )
         return self.engine
 
     def connect(self):
-        engine = getattr(self, "engine", None)
-        if not engine:
-            self.create_engine()
-        self.con = self.engine.connect()
+        endpoint = self.endpoint if self.endpoint else os.getenv("DSDB_ENDPOINT")
+        region = self.region if self.region else os.getenv("DSDB_REGION")
+        db_type = self.db_type if self.db_type else os.getenv("DSDB_TYPE")
+        host = self.host if self.host else os.getenv("DSDB_HOST")
+
+        if type == "dynamodb":
+            self.con = boto3.resource(
+                db_type, region_name=region, endpoint_url=endpoint
+            )
+        elif type == "mongodb":
+            self.con = MongoClient(host)
+        else:
+            engine = getattr(self, "engine", None)
+            if not engine:
+                self.create_engine()
+            self.con = self.engine.connect()
         return self.con
 
     def close(self):
-        self.con.close()
+        if not type == "dynamodb":
+            self.con.close()
         return self
 
 
@@ -56,4 +74,4 @@ def DsDbConnect(db=DsDb(), buf=print, hide_parameters=True):
     t0 = datetime.now()
     yield db.connect()
     db.close()
-    buf(f"executed in {datetime.now()-t0}")
+    buf(f"executed in {datetime.now() - t0}")

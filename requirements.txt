@@ -1,5 +1,3 @@
 attrs
 psycopg2-binary
 sqlalchemy
-boto3
-pymongo

@@ -6,8 +6,16 @@ import contextlib
 from datetime import datetime
 import attr
 from sqlalchemy import create_engine
-import boto3
-from pymongo import MongoClient
+import logging
+logger = logging.getLogger("dsdb")
+try:
+    import boto3
+except ModuleNotFoundError:
+    logger.debug("`boto3` not found. Skipping ")
+try:
+    from pymongo import MongoClient
+except ModuleNotFoundError:
+    logger.debug("`pymongo` not found. Skipping ")
 
 
 def return_pwd(*args):

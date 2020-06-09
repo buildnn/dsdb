@@ -71,7 +71,7 @@ class DsDb(object):
             return self.con
 
     def close(self):
-        if not db_type == "dynamodb":
+        if not self.db_type == "dynamodb":
             if hasattr(self, "con"):
                 self.con.close()
             if hasattr(self, "client"):

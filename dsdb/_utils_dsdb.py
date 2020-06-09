@@ -55,12 +55,12 @@ class DsDb(object):
         db_type = self.db_type if self.db_type else os.getenv("DSDB_TYPE")
         host = self.host if self.host else os.getenv("DSDB_HOST")
 
-        if type == "dynamodb":
+        if db_type == "dynamodb":
             self.client = boto3.resource(
                 db_type, region_name=region, endpoint_url=endpoint
             )
             return self.client
-        elif type == "mongodb":
+        elif db_type == "mongodb":
             self.client = MongoClient(host)
             return self.client
         else:
@@ -71,7 +71,7 @@ class DsDb(object):
             return self.con
 
     def close(self):
-        if not type == "dynamodb":
+        if not db_type == "dynamodb":
             if hasattr(self, "con"):
                 self.con.close()
             if hasattr(self, "client"):

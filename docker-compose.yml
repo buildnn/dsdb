@@ -1,7 +1,7 @@
 version: '3.7'
 services:
-  jupyter:
-    image: jupyter/scipy-notebook:latest
+  ds:
+    image: jupyter/base-notebook:latest
     container_name: jupyter-dsdb
     environment:
       # Jupyter container variables
@@ -10,43 +10,59 @@ services:
       DSDB_USER: ${DSDB_USER}
       DSDB_PASSWORD: ${DSDB_PASSWORD}
       DSDB_DB: ${DSDB_DB}
-      DSDB_HOST: db:5432
+      DSDB_HOST: redis:5432
       DSDB_DRIVER: postgres+psycopg2
     command: [
-      "/bin/bash", "-c", "conda install --yes --quiet psycopg2 sqlalchemy && pip install -q dsdb && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"]
+      "/bin/bash", "-c", "conda install --yes --quiet -c conda-forge redis-py && python -m pip install -e /home/jovyan/local_directory && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"]
     ports:
         - 8888:8888
     volumes:
       - ./:/home/jovyan/local_directory
       - jupyter_conda:/opt/conda
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
 
-  db:
-    build:
-      context: https://bitbucket.org/buildnn/docker-dsdb-postgres.git
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      DSDB_USER: ${DSDB_USER}
-      DSDB_DB: ${DSDB_DB}
-      DSDB_PASSWORD: ${DSDB_PASSWORD}
-      POSTGRES_MULTIDB: "${DSDB_DB}:${DSDB_USER}:${DSDB_PASSWORD}"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
+  # db:
+  #   build:
+  #     context: https://bitbucket.org/buildnn/docker-dsdb-postgres.git
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     DSDB_USER: ${DSDB_USER}
+  #     DSDB_DB: ${DSDB_DB}
+  #     DSDB_PASSWORD: ${DSDB_PASSWORD}
+  #     POSTGRES_MULTIDB: "${DSDB_DB}:${DSDB_USER}:${DSDB_PASSWORD}"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data/
 
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      PGADMIN_LISTEN_PORT: 5050
+  redis:
+    image: redis:6
+    command: [ "redis-server", "/etc/redis/conf/redis.conf" ]
     ports:
-      - 5050:5050
-    depends_on:
-      - db
+      - 6379:6379
+    volumes:
+      - ./docker/redis/:/etc/redis/conf
+  
+  redis-insights:
+    image: redislabs/redisinsight
+    ports:
+      - 8001:8001
+    volumes:
+      - redisinsight:/db
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #     PGADMIN_LISTEN_PORT: 5050
+  #   ports:
+  #     - 5050:5050
+  #   depends_on:
+  #     - db
 
 volumes:
-  postgres_data:
+  # postgres_data:
   jupyter_conda:
+  redisinsight:

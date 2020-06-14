@@ -3,19 +3,28 @@
 
 import os
 import contextlib
-from datetime import datetime
 import attr
-from sqlalchemy import create_engine
 import logging
+from datetime import datetime
+
+from sqlalchemy import create_engine
+
 logger = logging.getLogger("dsdb")
+
 try:
     import boto3
 except ModuleNotFoundError:
     logger.debug("`boto3` not found. Skipping ")
+
 try:
     from pymongo import MongoClient
 except ModuleNotFoundError:
     logger.debug("`pymongo` not found. Skipping ")
+
+try:
+    from redis import Redis
+except ModuleNotFoundError:
+    logger.debug("`redis` not found. Skipping ")
 
 
 def return_pwd(*args):
@@ -24,45 +33,63 @@ def return_pwd(*args):
 
 @attr.s
 class DsDb(object):
-    usr = attr.ib(default=None)
     db = attr.ib(default=None)
-    host = attr.ib(default=None)
-    driver = attr.ib(default=None)
-    hide_parameters = attr.ib(default=True)
-    pwd = attr.ib(default=None, repr=False)
-    endpoint = attr.ib(default=None)
-    region = attr.ib(default=None)
     db_type = attr.ib(default=None)
+    driver = attr.ib(default=None)
+    endpoint = attr.ib(default=None)
+    hide_parameters = attr.ib(default=True)
+    host = attr.ib(default=None)
+    port = attr.ib(default=None)
+    pwd = attr.ib(default=None, repr=False)
+    region = attr.ib(default=None)
+    usr = attr.ib(default=None)
+
+    def __attrs_post_init__(self):
+        self.db = self.db if self.db else os.getenv("DSDB_DB")
+        self.db_type = self.db_type if self.db_type else os.getenv("DSDB_TYPE")
+        self.driver = self.driver if self.driver else os.getenv("DSDB_DRIVER")
+        self.endpoint = self.endpoint if self.endpoint else os.getenv("DSDB_ENDPOINT")
+        self.host = self.host if self.host else os.getenv("DSDB_HOST")
+        self.port = self.port if self.port else os.getenv("DSDB_PORT")
+        self.region = self.region if self.region else os.getenv("DSDB_REGION")
+        self.usr = self.usr if self.usr else os.getenv("DSDB_USER")
 
     def create_engine(self):
-
-        usr = self.usr if self.usr else os.getenv("DSDB_USER")
-        db = self.db if self.db else os.getenv("DSDB_DB")
-        host = self.host if self.host else os.getenv("DSDB_HOST")
-        driver = self.driver if self.driver else os.getenv("DSDB_DRIVER")
         pwd = self.pwd if self.pwd else os.getenv("DSDB_PASSWORD")
 
         self.engine = create_engine(
-            "{}://{}:{}@{}/{}".format(driver, usr, pwd, host, db,),
+            "{}://{}:{}@{}/{}".format(
+                self.driver,
+                self.usr,
+                pwd,
+                ":".join([self.host, self.port] if self.port != "" else [self.host]),
+                self.db,
+            ),
             echo=False,
             hide_parameters=self.hide_parameters,
         )
         return self.engine
 
     def connect(self):
-        endpoint = self.endpoint if self.endpoint else os.getenv("DSDB_ENDPOINT")
-        region = self.region if self.region else os.getenv("DSDB_REGION")
-        db_type = self.db_type if self.db_type else os.getenv("DSDB_TYPE")
-        host = self.host if self.host else os.getenv("DSDB_HOST")
 
-        if db_type == "dynamodb":
+        pwd = self.pwd if self.pwd else os.getenv("DSDB_PASSWORD")
+
+        if self.db_type == "dynamodb":
             self.client = boto3.resource(
-                db_type, region_name=region, endpoint_url=endpoint
+                self.db_type, region_name=self.region, endpoint_url=self.endpoint
             )
             return self.client
-        elif db_type == "mongodb":
-            self.client = MongoClient(host)
+
+        elif self.db_type == "mongodb":
+            self.client = MongoClient(self.host)
             return self.client
+
+        elif self.db_type == "redis":
+            self.client = Redis(
+                host=self.host, port=int(self.port), username=self.usr, password=pwd, db=self.db
+            )
+            return self.client
+
         else:
             engine = getattr(self, "engine", None)
             if not engine:
@@ -80,7 +107,8 @@ class DsDb(object):
 
 
 @contextlib.contextmanager
-def DsDbConnect(db=DsDb(), buf=print, hide_parameters=True):
+def DsDbConnect(db=None, buf=None, hide_parameters=True):
+    buf = print if not buf else buf
     if not db:
         db = DsDb(hide_parameters=hide_parameters)
     buf("connecting to DSDB...")

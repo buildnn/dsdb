@@ -107,12 +107,18 @@ class DsDb(object):
 
 
 @contextlib.contextmanager
-def DsDbConnect(db=None, buf=None, hide_parameters=True):
-    buf = print if not buf else buf
+def DsDbConnect(db=None, buf="print", hide_parameters=True):
+    buf = print if buf == "print" else buf
+
     if not db:
         db = DsDb(hide_parameters=hide_parameters)
-    buf("connecting to DSDB...")
+
+    if buf:
+        buf("connecting to DSDB...")
     t0 = datetime.now()
+
     yield db.connect()
     db.close()
-    buf(f"executed in {datetime.now() - t0}")
+
+    if buf:
+        buf(f"executed in {datetime.now() - t0}")

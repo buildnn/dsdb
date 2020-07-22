@@ -65,7 +65,6 @@ class DsDb(object):
 
     def create_engine(self, pwd):
 
-        # DEPRE
         if not self.port:
             if ":" in self.host:
                 warnings.warn(
@@ -107,7 +106,9 @@ class DsDb(object):
             return self.client
 
         elif self.db_type == "mongodb":
-            self.client = MongoClient(self.host)
+            self.client = MongoClient(
+                self.host, username=self.usr, password=pwd, authSource=self.db
+            )
             return self.client
 
         elif self.db_type == "redis":

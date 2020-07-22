@@ -4,18 +4,21 @@ services:
     image: jupyter/scipy-notebook:latest
     container_name: jupyter-dsdb
     environment:
+      # Jupyter container variables
       JUPYTER_ENABLE_LAB: 1
+      # DsDb variables
       DSDB_USER: ${DSDB_USER}
       DSDB_PASSWORD: ${DSDB_PASSWORD}
       DSDB_DB: ${DSDB_DB}
       DSDB_HOST: db:5432
       DSDB_DRIVER: postgres+psycopg2
     command: [
-      "/bin/bash", "-c", "conda install --yes --quiet psycopg2 sqlalchemy && pip install -q git+https://bitbucket.org/buildnn/dsdb.git && start-notebook.sh --notebook-dir /local_directory --ip 0.0.0.0 --no-browser"]
+      "/bin/bash", "-c", "conda install --yes --quiet psycopg2 sqlalchemy && pip install -q dsdb && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"]
     ports:
         - 8888:8888
     volumes:
-      - ./:/local_directory
+      - ./:/home/jovyan/local_directory
+      - jupyter_conda:/opt/conda
     depends_on:
       - db
 
@@ -46,3 +49,4 @@ services:
 
 volumes:
   postgres_data:
+  jupyter_conda:

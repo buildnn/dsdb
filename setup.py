@@ -1,7 +1,7 @@
 from os import path
 from setuptools import setup
 
-__version__ = "0.1.1"
+__version__ = "0.1.3"
 
 here = path.abspath(path.dirname(__file__))
 
@@ -15,6 +15,9 @@ with open(path.join(here, "LICENSE"), encoding="utf-8") as f:
 # get the dependencies and installs
 with open(path.join(here, "requirements.txt"), encoding="utf-8") as f:
     all_reqs = f.read().split("\n")
+
+with open(path.join(here, 'requirements-nosql.txt'), encoding='utf-8') as f:
+    nosql_reqs = f.read().split('\n')
 
 install_requires = [x.strip() for x in all_reqs if "git+" not in x]
 # dependency_links = [
@@ -38,7 +41,8 @@ setup(
     # include_package_data=True,
     author="Giacomo Barone, Buildnn",
     install_requires=install_requires,
+    extras_require={'dev': install_requires + nosql_reqs,
+                    'nosql': nosql_reqs},
     # dependency_links=dependency_links,
     author_email="giacomo.barone@buildnn.com",
 )
-

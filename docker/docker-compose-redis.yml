@@ -3,16 +3,10 @@ services:
   ds:
     image: jupyter/base-notebook:latest
     container_name: jupyter-dsdb
+    env_file: redis.env
     environment:
       # Jupyter container variables
       JUPYTER_ENABLE_LAB: 1
-      # DsDb variables
-      DSDB_USER: ${DSDB_USER}
-      DSDB_PASSWORD: ${DSDB_PASSWORD}
-      DSDB_DB: ${DSDB_DB}
-      DSDB_HOST: ${DSDB_HOST}
-      DSDB_PORT: ${DSDB_PORT}
-      DSDB_TYPE: ${DSDB_TYPE}
     command: >
       bash -c "conda install --yes --quiet -c conda-forge redis-py
       && python -m pip install -e /home/jovyan/local_directory
@@ -20,10 +14,8 @@ services:
     ports:
         - 8888:8888
     volumes:
-      - ./:/home/jovyan/local_directory
+      - ../:/home/jovyan/local_directory
       - jupyter_conda:/opt/conda
-    # depends_on:
-    #   - db
 
   redis:
     image: redis:6
@@ -31,15 +23,7 @@ services:
     ports:
       - 6379:6379
     volumes:
-      - ./docker/redis/:/etc/redis/conf
-  
-  redis-insights:
-    image: redislabs/redisinsight
-    ports:
-      - 8001:8001
-    volumes:
-      - redisinsight:/db
+      - ./redis/:/etc/redis/conf
 
 volumes:
   jupyter_conda:
-  redisinsight:

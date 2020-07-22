@@ -52,9 +52,10 @@ touch .env
 
 Open the `.env` file and place the following text, filling the `{text under curly brackets}` as suggested:
 
-_content of the `.env` file -->_
+_to create a new `.env` file -->_
 
-```ini
+```bash
+$ tee .env <<EOF
 DSDB_USER=datascientist
 DSDB_PASSWORD={your password}
 DSDB_DB=dsdb
@@ -65,6 +66,7 @@ POSTGRES_DB=mydb
 
 PGADMIN_DEFAULT_EMAIL={your email}
 PGADMIN_DEFAULT_PASSWORD={another different password}
+EOF
 ```
 
 And then start the game

@@ -55,7 +55,7 @@ Open the `.env` file and place the following text, filling the `{text under curl
 _to create a new `.env` file -->_
 
 ```bash
-$ tee .envt <<EOF
+$ tee .env <<EOF
 DSDB_USER=datascientist
 DSDB_PASSWORD={your password}
 DSDB_DB=dsdb

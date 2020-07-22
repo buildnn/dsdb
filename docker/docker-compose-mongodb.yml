@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  ds:
+    image: jupyter/base-notebook:latest
+    container_name: jupyter-dsdb
+    env_file: mongodb.env
+    environment:
+      # Jupyter container variables
+      JUPYTER_ENABLE_LAB: 1
+    command: >
+      bash -c "conda install --yes --quiet -c conda-forge redis-py
+      && python -m pip install -e /home/jovyan/local_directory
+      && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"
+    ports:
+        - 8888:8888
+    volumes:
+      - ../:/home/jovyan/local_directory
+      - jupyter_conda:/opt/conda
+
+  mongodb:
+    image: mongo:4
+    env_file: mongodb.env
+    ports:
+      - 27017:27017
+      - 27018:27018
+      - 27019:27019
+    volumes:
+      - ./mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+
+volumes:
+  jupyter_conda:

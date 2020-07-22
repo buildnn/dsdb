@@ -1,0 +1,37 @@
+version: '3.7'
+services:
+  ds:
+    image: jupyter/base-notebook:latest
+    container_name: jupyter-dsdb
+    env_file: postgres.env
+    environment:
+      # Jupyter container variables
+      JUPYTER_ENABLE_LAB: 1
+    command: >
+      bash -c "conda install --yes --quiet psycopg2 sqlalchemy pandas
+      && python -m pip install -e /home/jovyan/local_directory
+      && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"
+    ports:
+        - 8888:8888
+    volumes:
+      - ../:/home/jovyan/local_directory
+      - jupyter_conda:/opt/conda
+  
+  postgres:
+    image: postgres:12
+    env_file: postgres.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d/
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file: pgadmin.env
+    ports:
+      - 5050:5050
+    depends_on:
+      - postgres
+  
+volumes:
+  jupyter_conda:

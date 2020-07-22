@@ -13,42 +13,42 @@ with open(path.join(here, "LICENSE"), encoding="utf-8") as f:
     license_ = f.read()
 
 # get the dependencies and installs
-with open(path.join(here, "requirements.txt"), encoding="utf-8") as f:
-    reqs = f.read().split("\n")
+install_requires = ["attrs"]
 
-with open(path.join(here, 'requirements-postgres.txt'), encoding='utf-8') as f:
-    postgres_reqs = f.read().split('\n')
-
-with open(path.join(here, 'requirements-dynamodb.txt'), encoding='utf-8') as f:
-    dynamodb_reqs = f.read().split('\n')
-
-with open(path.join(here, 'requirements-mongo.txt'), encoding='utf-8') as f:
-    mongo_reqs = f.read().split('\n')
-
-with open(path.join(here, 'requirements-redis.txt'), encoding='utf-8') as f:
-    redis_reqs = f.read().split('\n')
-
-with open(path.join(here, 'requirements-dev.txt'), encoding='utf-8') as f:
-    dev_reqs = f.read().split('\n')
+# --
+postgres_reqs = ["sqlalchemy", "psycopg2-binary"]
+dynamodb_reqs = ["boto3"]
+mongo_reqs = ["pymongo"]
+redis_reqs = ["redis"]
+dev_reqs = ["pytest", "pytest-cov", "black", "flake8"]
 
 nosql_reqs = dynamodb_reqs + mongo_reqs + redis_reqs
 all_reqs = dynamodb_reqs + mongo_reqs + redis_reqs + postgres_reqs
 
-install_requires = [x.strip() for x in reqs if "git+" not in x]
+extras_require = dict(
+        dev=all_reqs + dev_reqs,
+        postgres=postgres_reqs,
+        dynamodb=dynamodb_reqs,
+        mongo=mongo_reqs,
+        redis=redis_reqs,
+        nosql=nosql_reqs,
+        all=all_reqs,
+)
 # dependency_links = [
 #     x.strip().replace('git+', '') for x in reqs if x.startswith('git+')]
 
 setup(
     name="dsdb",
     version=__version__,
-    description="Quick and real database peristence for Data Scientists.",
+    description="One-line database manager for Data Science workloads.",
     # long_description=long_description,
     # long_description_content_type='text/markdown',
     url="https://github.com/buildnn/dsdb",
     license=license_,
     classifiers=[
-        "Development Status :: 2 - Beta",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
     ],
     packages=["dsdb"],
@@ -56,15 +56,7 @@ setup(
     # include_package_data=True,
     author="Giacomo Barone, Buildnn",
     install_requires=install_requires,
-    extras_require={
-        'dev': all_reqs + dev_reqs,
-        'postgres': postgres_reqs,
-        'dynamodb': dynamodb_reqs,
-        'mongo': mongo_reqs,
-        'redis': redis_reqs,
-        'nosql': nosql_reqs,
-        'all': all_reqs,
-    },
+    extras_require=extras_require,
     # dependency_links=dependency_links,
     author_email="giacomo.barone@buildnn.com",
 )

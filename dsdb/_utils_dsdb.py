@@ -6,12 +6,15 @@ import contextlib
 import attr
 import logging
 from datetime import datetime
+import warnings
+
 
 logger = logging.getLogger("dsdb")
 
 
 try:
     from sqlalchemy import create_engine
+    from sqlalchemy.engine.url import URL
 except ModuleNotFoundError:
     logger.debug("`sqlalchemy` not found. Skipping ")
 
@@ -47,6 +50,7 @@ class DsDb(object):
     pwd = attr.ib(default=None, repr=False)
     region = attr.ib(default=None)
     usr = attr.ib(default=None)
+    query = attr.ib(default=None)
 
     def __attrs_post_init__(self):
         self.db = self.db if self.db else os.getenv("DSDB_DB")
@@ -57,20 +61,35 @@ class DsDb(object):
         self.port = self.port if self.port else os.getenv("DSDB_PORT")
         self.region = self.region if self.region else os.getenv("DSDB_REGION")
         self.usr = self.usr if self.usr else os.getenv("DSDB_USER")
+        self.query = self.query if self.query else os.getenv("DSDB_QUERY")
 
     def create_engine(self, pwd):
-        if self.port:
-            host = ":".join([self.host, self.port])
+
+        # DEPRE
+        if not self.port:
+            if ":" in self.host:
+                warnings.warn(
+                    "the embedding of port in `DSDB_HOST` (eg. 'localhost:4532') will be "
+                    "removed from 0.3 on. Use the `DSDB_PORT` parameter instead.",
+                    DeprecationWarning,
+                )
+                host, port = self.host.split(":")
+            else:
+                host = self.host
+                port = None
         else:
             host = self.host
+            port = self.port
 
         self.engine = create_engine(
-            "{}://{}:{}@{}/{}".format(
-                self.driver,
-                self.usr,
-                pwd,
-                host,
-                self.db,
+            URL(
+                drivername=self.driver,
+                username=self.usr,
+                password=pwd,
+                host=host,
+                port=port,
+                database=self.db,
+                query=self.query,
             ),
             echo=False,
             hide_parameters=self.hide_parameters,
@@ -93,7 +112,11 @@ class DsDb(object):
 
         elif self.db_type == "redis":
             self.client = Redis(
-                host=self.host, port=int(self.port), username=self.usr, password=pwd, db=self.db
+                host=self.host,
+                port=int(self.port),
+                username=self.usr,
+                password=pwd,
+                db=self.db,
             )
             return self.client
 

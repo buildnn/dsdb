@@ -7,9 +7,13 @@ import attr
 import logging
 from datetime import datetime
 
-from sqlalchemy import create_engine
-
 logger = logging.getLogger("dsdb")
+
+
+try:
+    from sqlalchemy import create_engine
+except ModuleNotFoundError:
+    logger.debug("`sqlalchemy` not found. Skipping ")
 
 try:
     import boto3
@@ -54,15 +58,18 @@ class DsDb(object):
         self.region = self.region if self.region else os.getenv("DSDB_REGION")
         self.usr = self.usr if self.usr else os.getenv("DSDB_USER")
 
-    def create_engine(self):
-        pwd = self.pwd if self.pwd else os.getenv("DSDB_PASSWORD")
+    def create_engine(self, pwd):
+        if self.port:
+            host = ":".join([self.host, self.port])
+        else:
+            host = self.host
 
         self.engine = create_engine(
             "{}://{}:{}@{}/{}".format(
                 self.driver,
                 self.usr,
                 pwd,
-                ":".join([self.host, self.port] if self.port != "" else [self.host]),
+                host,
                 self.db,
             ),
             echo=False,
@@ -93,7 +100,7 @@ class DsDb(object):
         else:
             engine = getattr(self, "engine", None)
             if not engine:
-                self.create_engine()
+                self.create_engine(pwd)
             self.con = self.engine.connect()
             return self.con
 

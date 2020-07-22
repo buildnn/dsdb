@@ -10,10 +10,13 @@ services:
       DSDB_USER: ${DSDB_USER}
       DSDB_PASSWORD: ${DSDB_PASSWORD}
       DSDB_DB: ${DSDB_DB}
-      DSDB_HOST: redis:5432
-      DSDB_DRIVER: postgres+psycopg2
-    command: [
-      "/bin/bash", "-c", "conda install --yes --quiet -c conda-forge redis-py && python -m pip install -e /home/jovyan/local_directory && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"]
+      DSDB_HOST: ${DSDB_HOST}
+      DSDB_PORT: ${DSDB_PORT}
+      DSDB_TYPE: ${DSDB_TYPE}
+    command: >
+      bash -c "conda install --yes --quiet -c conda-forge redis-py
+      && python -m pip install -e /home/jovyan/local_directory
+      && start-notebook.sh --notebook-dir ~/local_directory --ip 0.0.0.0 --no-browser"
     ports:
         - 8888:8888
     volumes:
@@ -21,20 +24,6 @@ services:
       - jupyter_conda:/opt/conda
     # depends_on:
     #   - db
-
-  # db:
-  #   build:
-  #     context: https://bitbucket.org/buildnn/docker-dsdb-postgres.git
-  #   environment:
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #     DSDB_USER: ${DSDB_USER}
-  #     DSDB_DB: ${DSDB_DB}
-  #     DSDB_PASSWORD: ${DSDB_PASSWORD}
-  #     POSTGRES_MULTIDB: "${DSDB_DB}:${DSDB_USER}:${DSDB_PASSWORD}"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data/
 
   redis:
     image: redis:6
@@ -51,18 +40,6 @@ services:
     volumes:
       - redisinsight:/db
 
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #     PGADMIN_LISTEN_PORT: 5050
-  #   ports:
-  #     - 5050:5050
-  #   depends_on:
-  #     - db
-
 volumes:
-  # postgres_data:
   jupyter_conda:
   redisinsight:

@@ -24,7 +24,7 @@ services:
 
   db:
     build:
-      context: https://bitbucket.org/buildnn/docker-dsdb-postgres.git
+      context: https://github.com/buildnn/buildnn-postgres.git
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
